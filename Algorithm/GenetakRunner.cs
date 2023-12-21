@@ -75,6 +75,9 @@ namespace GeneticTAP.Algorithm
         /// </summary>
         public Chromosome? Run()
         {
+            Console.WriteLine("==============================================================================");
+            Console.WriteLine("RUNNING GENETAK");
+            Console.WriteLine("==============================================================================");
             Parallel.For(0, PopulationSize, i =>
             {
                 var chromosome = new Chromosome(GetRandomGenome());
@@ -115,17 +118,32 @@ namespace GeneticTAP.Algorithm
                     }
                 }
                 var babyGoat = newPopulation.MaxBy(c => c.Fitness);
-                Console.WriteLine($"Generation {generation} best: {babyGoat.Fitness}");
+                Console.WriteLine($"Generation {generation,3} best: {-babyGoat.Fitness:F3} km.");
                 _population = newPopulation;
             }
             var goat = _population.MaxBy(c => c.Fitness);
-
-            Console.WriteLine("Found goat:");
+            var missingPubs = _sortedGenome.Except(goat.Genome);
+            if (missingPubs.Any())
+            {
+                Console.WriteLine("==============================================================================");
+                Console.WriteLine("GENETAK FAILED");
+                Console.WriteLine("==============================================================================");
+                Console.WriteLine("Missing pubs:");
+                foreach (var pub in missingPubs)
+                {
+                    Console.WriteLine($"{_pubs[pub].Name}");
+                }
+                return null;
+            }
+            Console.WriteLine("==============================================================================");
+            Console.WriteLine("GENETAK FINISHED");
+            Console.WriteLine("==============================================================================");
+            Console.WriteLine("Best solution:");
             foreach (var pub in goat.Genome)
             {
                 Console.WriteLine($"{_pubs[pub].Name}");
             }
-            Console.WriteLine($"Distance: {-goat.Fitness} km.");
+            Console.WriteLine($"Distance: {-goat.Fitness:F3} km.");
 
 
             return goat;

@@ -21,13 +21,13 @@ namespace GeneticTAP
                     {
                         Console.WriteLine($"{pub.Name,-40}{pub.Latitude,-20}{pub.Longitude,-20}");
                     }
-                    var runner = new GenetakRunner(pubs.ToArray(), 10000)
+                    var runner = new GenetakRunner(pubs.ToArray(), 1_000_000)
                     {
-                        Generations = 10000,
+                        Generations = 50,
                         TournamentSize = 50,
                         MutationRate = 0.01,
                         CrossoverRate = 0.8,
-                        ElitismCount = 100,
+                        ElitismCount = 125,
                     };
                     var bestSolution = runner.Run();
                 }
