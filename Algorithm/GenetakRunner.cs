@@ -46,12 +46,6 @@ namespace GeneticTAP.Algorithm
         /// </summary>
         public int ElitismCount
         { get; set; }
-
-        /// <summary>
-        /// How many generations in without improvement before we regenerate the population (while still keeping the elites).
-        /// </summary>
-        public int StagnationLimit
-        { get; set; }
         #endregion
         public GenetakRunner(Pub[] pubs, int populationSize)
         {
@@ -91,69 +85,40 @@ namespace GeneticTAP.Algorithm
                 _population[i] = chromosome;
             });
 
-            var bestCandidate = _population.MaxBy(c => c.Fitness);
-            int stagnationCounter = 0;
             for (int generation = 0; generation < Generations; generation++)
             {
                 var newPopulation = new Chromosome[PopulationSize];
-                if (stagnationCounter == StagnationLimit)
+                if (ElitismCount > 0)
                 {
-                    Console.WriteLine("Detected stagnation, preserving elites (if set) and regenerating the rest.");
-                    stagnationCounter = 0;
-                    Parallel.For(ElitismCount, PopulationSize, i =>
+                    AddElites(newPopulation);
+                }
+                for (int initialized = ElitismCount; initialized < PopulationSize;)
+                {
+                    Chromosome firstCandidate = TournamentSelect();
+                    Chromosome secondCandidate = TournamentSelect();
+                    if (_random.Value.NextDouble() < CrossoverRate)
                     {
-                        var chromosome = new Chromosome(GetRandomGenome());
-                        chromosome.Fitness = CalculateFitness(chromosome);
-                        newPopulation[i] = chromosome;
-                    });
-                    if (ElitismCount > 0)
+                        (firstCandidate, secondCandidate) = Crossover(firstCandidate, secondCandidate);
+                    }
+                    if (_random.Value.NextDouble() < MutationRate)
                     {
-                        AddElites(newPopulation);
+                        Mutate(firstCandidate);
+                    }
+                    if (_random.Value.NextDouble() < MutationRate)
+                    {
+                        Mutate(secondCandidate);
+                    }
+                    if (initialized < PopulationSize)
+                    {
+                        newPopulation[initialized++] = firstCandidate;
+                    }
+                    if (initialized < PopulationSize)
+                    {
+                        newPopulation[initialized++] = secondCandidate;
                     }
                 }
-                else
-                {
-                    if (ElitismCount > 0)
-                    {
-                        AddElites(newPopulation);
-                    }
-                    for (int initialized = ElitismCount; initialized < PopulationSize;)
-                    {
-                        Chromosome firstCandidate = TournamentSelect();
-                        Chromosome secondCandidate = TournamentSelect();
-                        if (_random.Value.NextDouble() < CrossoverRate)
-                        {
-                            (firstCandidate, secondCandidate) = Crossover(firstCandidate, secondCandidate);
-                        }
-                        if (_random.Value.NextDouble() < MutationRate)
-                        {
-                            Mutate(firstCandidate);
-                        }
-                        if (_random.Value.NextDouble() < MutationRate)
-                        {
-                            Mutate(secondCandidate);
-                        }
-                        if (initialized < PopulationSize)
-                        {
-                            newPopulation[initialized++] = firstCandidate;
-                        }
-                        if (initialized < PopulationSize)
-                        {
-                            newPopulation[initialized++] = secondCandidate;
-                        }
-                    }
-                    var newBestCandidate = newPopulation.MaxBy(c => c.Fitness);
-                    if (newBestCandidate.Fitness <= bestCandidate.Fitness)
-                    {
-                        stagnationCounter++;
-                    }
-                    else
-                    {
-                        stagnationCounter = 0;
-                    }
-                    bestCandidate = newBestCandidate;
-                    Console.WriteLine($"Generation {generation,3} best: {-bestCandidate.Fitness:F3} km.");
-                }
+                var babyGoat = newPopulation.MaxBy(c => c.Fitness);
+                Console.WriteLine($"Generation {generation,3} best: {-babyGoat.Fitness:F3} km.");
                 _population = newPopulation;
             }
             var goat = _population.MaxBy(c => c.Fitness);

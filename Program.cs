@@ -28,7 +28,6 @@ namespace GeneticTAP
                         MutationRate = 0.01,
                         CrossoverRate = 0.8,
                         ElitismCount = 125,
-                        StagnationLimit = 5
                     };
                     var bestSolution = runner.Run();
                 }
