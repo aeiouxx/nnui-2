@@ -4,10 +4,8 @@ namespace GeneticTAP.Algorithm
 {
     internal class GenetakRunner
     {
-        private static int seed = Environment.TickCount;
         #region Data
         private readonly Pub[] _pubs;
-        private readonly ThreadLocal<Random> _random = new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref seed)));
         private readonly DistanceCache _distanceCache;
 
         private Chromosome[] _population;
@@ -96,30 +94,28 @@ namespace GeneticTAP.Algorithm
                 {
                     Chromosome firstCandidate = TournamentSelect();
                     Chromosome secondCandidate = TournamentSelect();
-                    if (_random.Value.NextDouble() < CrossoverRate)
+                    if (Randomizer.Generator.NextDouble() < CrossoverRate)
                     {
-                        (firstCandidate, secondCandidate) = Crossover(firstCandidate, secondCandidate);
+                        (firstCandidate, secondCandidate) = firstCandidate.CrossoverWith(secondCandidate, CalculateFitness);
                     }
-                    if (_random.Value.NextDouble() < MutationRate)
+                    if (Randomizer.Generator.NextDouble() < MutationRate)
                     {
-                        Mutate(firstCandidate);
+                        firstCandidate.Mutate();
                     }
-                    if (_random.Value.NextDouble() < MutationRate)
-                    {
-                        Mutate(secondCandidate);
-                    }
+                    newPopulation[initialized++] = firstCandidate;
                     if (initialized < PopulationSize)
                     {
-                        newPopulation[initialized++] = firstCandidate;
-                    }
-                    if (initialized < PopulationSize)
-                    {
+                        if (Randomizer.Generator.NextDouble() < MutationRate)
+                        {
+                            secondCandidate.Mutate();
+                        }
                         newPopulation[initialized++] = secondCandidate;
                     }
+
+                    var babyGoat = newPopulation.MaxBy(c => c.Fitness);
+                    Console.WriteLine($"Generation {generation,3} best: {-babyGoat.Fitness:F3} km.");
+                    _population = newPopulation;
                 }
-                var babyGoat = newPopulation.MaxBy(c => c.Fitness);
-                Console.WriteLine($"Generation {generation,3} best: {-babyGoat.Fitness:F3} km.");
-                _population = newPopulation;
             }
             var goat = _population.MaxBy(c => c.Fitness);
             var missingPubs = _sortedGenome.Except(goat.Genome);
@@ -160,11 +156,10 @@ namespace GeneticTAP.Algorithm
         }
         private void Shuffle(int[] array)
         {
-            var random = _random.Value;
             int n = array.Length;
             for (int i = n - 1; i > 0; i--)
             {
-                int j = random.Next(i + 1);
+                int j = Randomizer.Generator.Next(i + 1);
                 (array[i], array[j]) = (array[j], array[i]);
             }
         }
@@ -183,13 +178,12 @@ namespace GeneticTAP.Algorithm
             Chromosome? goated = null;
             for (int i = 0; i < TournamentSize; i++)
             {
-                Chromosome randomSelection = _population[_random.Value.Next(PopulationSize)];
+                Chromosome randomSelection = _population[Randomizer.Generator.Next(PopulationSize)];
                 if (goated == null || randomSelection.Fitness > goated.Fitness)
                 {
                     goated = randomSelection;
                 }
             }
-
             return (Chromosome)goated.Clone();
         }
 
@@ -212,75 +206,6 @@ namespace GeneticTAP.Algorithm
             {
                 toFill[i] = (Chromosome)queue.Dequeue().Clone();
             }
-        }
-
-        /// <summary>
-        /// Find a random range of genes from parent 1/2 and copy them to kids 2/1.
-        /// Copy the rest of the genes from parent 1/2 to kids 1/2.
-        /// </summary>
-        /// <param name="mommy"></param>
-        /// <param name="daddy"></param>
-        /// <returns></returns>
-        // TODO: Refactor and test this unreadable garbage
-        private (Chromosome kidOne, Chromosome kidTwo) Crossover(Chromosome mommy, Chromosome daddy)
-        {
-            var startInclusive = _random.Value.Next(GenomeLength - 2);
-            var endInclusive = _random.Value.Next(startInclusive + 1, GenomeLength - 1);
-            var kidOneGenome = new int[GenomeLength];
-            var kidTwoGenome = new int[GenomeLength];
-            var kidOneCopiedGenes = new bool[GenomeLength];
-            var kidTwoCopiedGenes = new bool[GenomeLength];
-            for (int i = startInclusive; i <= endInclusive; i++)
-            {
-                kidOneGenome[i] = daddy.Genome[i];
-                kidTwoGenome[i] = mommy.Genome[i];
-
-                kidOneCopiedGenes[daddy.Genome[i]] = true;
-                kidTwoCopiedGenes[mommy.Genome[i]] = true;
-            }
-            int kidOneCurrentGeneIndex = (endInclusive + 1) % GenomeLength;
-            int kidTwoCurrentGeneIndex = (endInclusive + 1) % GenomeLength;
-            int genesToCopy = GenomeLength - (endInclusive - startInclusive + 1);
-            int mommyCopyGeneIndex = kidOneCurrentGeneIndex;
-            int daddyCopyGeneIndex = kidTwoCurrentGeneIndex;
-            for (int i = 0; i < genesToCopy; i++)
-            {
-                while (kidOneCopiedGenes[mommy.Genome[mommyCopyGeneIndex]])
-                {
-                    mommyCopyGeneIndex = (mommyCopyGeneIndex + 1) % GenomeLength;
-                }
-                kidOneGenome[kidOneCurrentGeneIndex] = mommy.Genome[mommyCopyGeneIndex];
-                kidOneCopiedGenes[kidOneGenome[kidOneCurrentGeneIndex]] = true;
-                kidOneCurrentGeneIndex = (kidOneCurrentGeneIndex + 1) % GenomeLength;
-                while (kidTwoCopiedGenes[daddy.Genome[daddyCopyGeneIndex]])
-                {
-                    daddyCopyGeneIndex = (daddyCopyGeneIndex + 1) % GenomeLength;
-                }
-                kidTwoGenome[kidTwoCurrentGeneIndex] = daddy.Genome[daddyCopyGeneIndex];
-                kidTwoCopiedGenes[kidTwoGenome[kidTwoCurrentGeneIndex]] = true;
-                kidTwoCurrentGeneIndex = (kidTwoCurrentGeneIndex + 1) % GenomeLength;
-            }
-            Chromosome kidOne = new Chromosome(kidOneGenome);
-            kidOne.Fitness = CalculateFitness(kidOne);
-            Chromosome kidTwo = new Chromosome(kidTwoGenome);
-            kidTwo.Fitness = CalculateFitness(kidTwo);
-            return (kidOne, kidTwo);
-        }
-
-        /// <summary>
-        /// Simply swap two random genes in the genome.
-        /// </summary>
-        /// <param name="chromosome"></param>
-        private void Mutate(Chromosome chromosome)
-        {
-            int firstIndex = _random.Value.Next(GenomeLength);
-            int secondIndex = _random.Value.Next(GenomeLength);
-            while (firstIndex == secondIndex)
-            {
-                secondIndex = _random.Value.Next(GenomeLength);
-            }
-            (chromosome.Genome[firstIndex], chromosome.Genome[secondIndex]) = (chromosome.Genome[secondIndex], chromosome.Genome[firstIndex]);
-            chromosome.Fitness = CalculateFitness(chromosome);
         }
         #endregion
     }

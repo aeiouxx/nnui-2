@@ -1,24 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;ReleaseWithTests</Configurations>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="res\**" />
     <EmbeddedResource Remove="res\**" />
     <None Remove="res\**" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.102.1" />
   </ItemGroup>
-
+    <ItemGroup>
+        <InternalsVisibleTo Include="GeneticTAP.Tests" />
+    </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy /y /d $(ProjecDir)res\Pubs.xlsx $(OutputPath)" />
   </Target>
-
 </Project>

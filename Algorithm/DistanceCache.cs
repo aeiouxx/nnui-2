@@ -2,9 +2,8 @@
 {
     /// <summary>
     /// Avoid having to calculate distances between pubs more than once.
+    /// For 35 items we don't need to worry about eviction, only C(35,2) entries in the cache
     /// </summary>
-
-    // fixme: this is rarted
     internal class DistanceCache
     {
         private readonly Dictionary<(int, int), double> _distances = new Dictionary<(int, int), double>();
