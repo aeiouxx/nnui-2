@@ -8,8 +8,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="res\**" />
+    <Compile Remove="src\bin\**" />
+    <Compile Remove="src\obj\**" />
+    <Compile Remove="test\**" />
     <EmbeddedResource Remove="res\**" />
+    <EmbeddedResource Remove="src\bin\**" />
+    <EmbeddedResource Remove="src\obj\**" />
+    <EmbeddedResource Remove="test\**" />
     <None Remove="res\**" />
+    <None Remove="src\bin\**" />
+    <None Remove="src\obj\**" />
+    <None Remove="test\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.102.1" />
@@ -17,7 +29,7 @@
     <ItemGroup>
         <InternalsVisibleTo Include="GeneticTAP.Tests" />
     </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /y /d $(ProjecDir)res\Pubs.xlsx $(OutputPath)" />
-  </Target>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="xcopy /y /d $(ProjecDir)..\res\Pubs.xlsx $(OutputPath)" />
+    </Target>
 </Project>

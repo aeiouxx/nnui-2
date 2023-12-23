@@ -111,11 +111,10 @@ namespace GeneticTAP.Algorithm
                         }
                         newPopulation[initialized++] = secondCandidate;
                     }
-
-                    var babyGoat = newPopulation.MaxBy(c => c.Fitness);
-                    Console.WriteLine($"Generation {generation,3} best: {-babyGoat.Fitness:F3} km.");
-                    _population = newPopulation;
                 }
+                var babyGoat = newPopulation.MaxBy(c => c.Fitness);
+                Console.WriteLine($"Generation {generation,3} best: {-babyGoat.Fitness:F3} km.");
+                _population = newPopulation;
             }
             var goat = _population.MaxBy(c => c.Fitness);
             var missingPubs = _sortedGenome.Except(goat.Genome);

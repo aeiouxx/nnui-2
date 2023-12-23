@@ -3,12 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneticTAP", "GeneticTAP.csproj", "{5E58C99F-C74B-49E3-B4D9-30DDB2FE3A17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneticTAP", "src\GeneticTAP.csproj", "{DEC6D7C6-0812-422E-A0F6-AD73B7A14316}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticTAP.Tests", "..\GeneticTAP.Tests\GeneticTAP.Tests.csproj", "{E96A3E0B-A2FE-4B0E-9B64-320A825B8761}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5E58C99F-C74B-49E3-B4D9-30DDB2FE3A17} = {5E58C99F-C74B-49E3-B4D9-30DDB2FE3A17}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneticTAP.Tests", "test\GeneticTAP.Tests.csproj", "{24F2CF0E-3BC1-4C41-A181-55C9DF3FA5FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5E58C99F-C74B-49E3-B4D9-30DDB2FE3A17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E58C99F-C74B-49E3-B4D9-30DDB2FE3A17}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5E58C99F-C74B-49E3-B4D9-30DDB2FE3A17}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5E58C99F-C74B-49E3-B4D9-30DDB2FE3A17}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E96A3E0B-A2FE-4B0E-9B64-320A825B8761}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E96A3E0B-A2FE-4B0E-9B64-320A825B8761}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E96A3E0B-A2FE-4B0E-9B64-320A825B8761}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E96A3E0B-A2FE-4B0E-9B64-320A825B8761}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEC6D7C6-0812-422E-A0F6-AD73B7A14316}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC6D7C6-0812-422E-A0F6-AD73B7A14316}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEC6D7C6-0812-422E-A0F6-AD73B7A14316}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC6D7C6-0812-422E-A0F6-AD73B7A14316}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24F2CF0E-3BC1-4C41-A181-55C9DF3FA5FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24F2CF0E-3BC1-4C41-A181-55C9DF3FA5FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24F2CF0E-3BC1-4C41-A181-55C9DF3FA5FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24F2CF0E-3BC1-4C41-A181-55C9DF3FA5FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
