@@ -7,20 +7,18 @@ namespace GeneticTAP
         const string Filename = "Pubs.xlsx";
         static void Main(string[] args)
         {
+            string executableLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string executablePath = Path.GetDirectoryName(executableLocation);
+            Directory.SetCurrentDirectory(executablePath);
             var directory = Directory.GetCurrentDirectory();
             var path = Path.Combine(directory, Filename);
             if (File.Exists(path))
             {
                 Console.WriteLine("File found, parsing...");
                 var parser = new ExcelParser();
-                if (parser.ReadPubsFromFile(path) is List<Pub> pubs)
+                if (parser.TryReadPubsFromFile(path, out var pubs))
                 {
                     Console.WriteLine($"Pubs (count: {pubs.Count}) parsed successfully: ");
-                    Console.WriteLine($"{"NAME",-40}{"LATITUDE",-20}{"LONGITUDE",-20}");
-                    foreach (var pub in pubs)
-                    {
-                        Console.WriteLine($"{pub.Name,-40}{pub.Latitude,-20}{pub.Longitude,-20}");
-                    }
                     var runner = new GenetakRunner(pubs.ToArray(), 1_000_000)
                     {
                         Generations = 50,
@@ -33,7 +31,7 @@ namespace GeneticTAP
                 }
                 else
                 {
-                    Console.Error.WriteLine("Error parsing pubs.");
+                    Console.Error.WriteLine($"Error while parsing pubs at location: {path}.");
                 }
             }
             else

@@ -68,13 +68,16 @@ namespace GeneticTAP.Algorithm
             _sortedGenome = Enumerable.Range(0, _pubs.Length).ToArray();
             _distanceCache = new DistanceCache(CalculateDistance);
         }
-        /// <summary>
-        /// Don't touch the algorithm parameters until run is finished or you'll go to jail.
-        /// </summary>
         public Chromosome? Run()
         {
             Console.WriteLine("==============================================================================");
-            Console.WriteLine("RUNNING GENETAK");
+            Console.WriteLine("RUNNING GENETAK, current parameters:");
+            Console.WriteLine($"Population size: {PopulationSize}");
+            Console.WriteLine($"Tournament size: {TournamentSize}");
+            Console.WriteLine($"Generations: {Generations}");
+            Console.WriteLine($"Mutation rate: {MutationRate}");
+            Console.WriteLine($"Crossover rate: {CrossoverRate}");
+            Console.WriteLine($"Elitism count: {ElitismCount}");
             Console.WriteLine("==============================================================================");
             Parallel.For(0, PopulationSize, i =>
             {
