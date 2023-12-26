@@ -19,13 +19,13 @@ namespace GeneticTAP
                 if (parser.TryReadPubsFromFile(path, out var pubs))
                 {
                     Console.WriteLine($"Pubs (count: {pubs.Count}) parsed successfully: ");
-                    var runner = new GenetakRunner(pubs.ToArray(), 1_000_000)
+                    var runner = new GenetakRunner(pubs.ToArray(), 100_000)
                     {
-                        Generations = 50,
+                        Generations = 35,
                         TournamentSize = 50,
                         MutationRate = 0.01,
                         CrossoverRate = 0.8,
-                        ElitismCount = 125,
+                        ElitismCount = 100,
                     };
                     var bestSolution = runner.Run();
                 }

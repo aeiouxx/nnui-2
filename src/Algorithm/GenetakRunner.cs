@@ -85,7 +85,6 @@ namespace GeneticTAP.Algorithm
                 chromosome.Fitness = CalculateFitness(chromosome);
                 _population[i] = chromosome;
             });
-
             for (int generation = 0; generation < Generations; generation++)
             {
                 var newPopulation = new Chromosome[PopulationSize];
@@ -104,6 +103,7 @@ namespace GeneticTAP.Algorithm
                     if (Randomizer.Generator.NextDouble() < MutationRate)
                     {
                         firstCandidate.Mutate();
+                        firstCandidate.Fitness = CalculateFitness(firstCandidate);
                     }
                     newPopulation[initialized++] = firstCandidate;
                     if (initialized < PopulationSize)
@@ -111,12 +111,25 @@ namespace GeneticTAP.Algorithm
                         if (Randomizer.Generator.NextDouble() < MutationRate)
                         {
                             secondCandidate.Mutate();
+                            secondCandidate.Fitness = CalculateFitness(secondCandidate);
                         }
                         newPopulation[initialized++] = secondCandidate;
                     }
                 }
                 var babyGoat = newPopulation.MaxBy(c => c.Fitness);
-                Console.WriteLine($"Generation {generation,3} best: {-babyGoat.Fitness:F3} km.");
+#if DEBUG
+                var oldFitness = babyGoat.Fitness;
+                if (_sortedGenome.Except(babyGoat.Genome).Any())
+                {
+                    Console.WriteLine("Missing a pub in genome!");
+                }
+                babyGoat.Fitness = CalculateFitness(babyGoat);
+                if (oldFitness != babyGoat.Fitness)
+                {
+                    Console.WriteLine("Fitness calculation error!");
+                }
+#endif
+                Console.WriteLine($"Generation {generation + 1,3} best: {-babyGoat.Fitness:F3} km.");
                 _population = newPopulation;
             }
             var goat = _population.MaxBy(c => c.Fitness);
